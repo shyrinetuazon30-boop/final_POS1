@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#176b45">
+  <title>Yohan Store POS</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23176b45'/%3E%3Ctext x='32' y='45' font-size='40' font-family='Arial' font-weight='bold' text-anchor='middle' fill='white'%3EY%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  
+  <section id="loginScreen" class="login-screen">
+    <div class="login-card">
+      <div class="brand-icon">Y</div>
+      <h1>Yohan Store</h1>
+      <p>Point of Sale System</p>
+
+      <form id="loginForm">
+        <label for="loginEmail">Email Address</label>
+        <input
+          id="loginEmail"
+          type="email"
+          placeholder="Enter your email"
+          autocomplete="username"
+          required
+        >
+
+        <label for="loginPassword">Password</label>
+        <input
+          id="loginPassword"
+          type="password"
+          placeholder="Enter your password"
+          autocomplete="current-password"
+          required
+        >
+
+        <button type="submit" class="primary-btn">
+          Sign In
+        </button>
+
+        <p id="loginMessage" role="alert"></p>
+      </form>
+    </div>
+  </section>
+
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-icon">Y</div>
+      <div>
+        <h1>Yohan Store</h1>
+        <p>Point of Sale System</p>
+      </div>
+    </div>
+
+    <div class="role-area">
+      <div class="user-info">
+        <strong id="userName"></strong>
+        <span id="userRole" class="pill"></span>
+      </div>
+      <button id="enableNotifBtn" type="button" class="secondary-btn" hidden>🔔 Enable Notifications</button>
+      <button id="logoutBtn" type="button" class="secondary-btn">Log out</button>
+    </div>
+  </header>
+
+  <div class="demo-notice">
+    Signed in — what you can see and do depends on the role assigned to your account.
+  </div>
+
+  <div class="app-layout">
+    <aside class="sidebar">
+      <p class="nav-heading">MAIN MENU</p>
+      <button class="nav-btn active" data-page="cashier">🛒 Cashier</button>
+      <button class="nav-btn" data-page="inventory">📦 Inventory</button>
+      <button class="nav-btn" data-page="requests">📋 Staff Requests</button>
+      <button class="nav-btn" data-page="reports">📊 Income Reports</button>
+      <div class="sidebar-footer">
+        <span class="status-dot"></span> Data stored in Firebase
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <section id="cashier" class="page active">
+        <div class="page-heading">
+          <div>
+            <h2>Cashier</h2>
+            <p>Choose products and prepare a transaction.</p>
+          </div>
+          <span id="cartCount" class="pill">0 items</span>
+        </div>
+
+        <div class="cashier-grid">
+          <div class="panel">
+            <div class="panel-heading">
+              <h3>Available Products</h3>
+              <input id="productSearch" type="search" placeholder="Search products...">
+            </div>
+            <div id="productGrid" class="product-grid"></div>
+          </div>
+
+          <div class="panel cart-panel">
+            <h3>Current Cart</h3>
+            <div id="cartItems" class="cart-items"></div>
+
+            <div class="total-row">
+              <span>Total</span>
+              <strong id="cartTotal">₱0.00</strong>
+            </div>
+
+            <label for="cashReceived">Customer cash received (₱)</label>
+            <input id="cashReceived" type="number" min="0" step="0.01"
+              placeholder="Enter amount received">
+
+            <div class="change-row">
+              <span>Change</span>
+              <strong id="changeAmount">₱0.00</strong>
+            </div>
+
+            <p id="paymentMessage" class="message" aria-live="polite"></p>
+
+            <div class="button-stack">
+              <button id="submitTransaction" class="primary-btn">
+                Submit Transaction
+              </button>
+              <button id="clearCart" class="secondary-btn">Clear Cart</button>
+            </div>
+
+            <p class="small-note">
+              Assistant Staff submits a request for review. Only authorized
+              Staff or Admin can finalize a sale.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="inventory" class="page">
+        <div class="page-heading">
+          <div>
+            <h2>Inventory</h2>
+            <p>View products and stock levels.</p>
+          </div>
+        </div>
+
+        <div id="inventorySummary" class="summary-grid"></div>
+
+        <div id="addProductPanel" class="panel">
+          <h3>Add New Product</h3>
+          <form id="productForm" class="product-form">
+            <div>
+              <label for="productName">Product name</label>
+              <input id="productName" required maxlength="80"
+                placeholder="e.g. Instant noodles">
+            </div>
+            <div>
+              <label for="costPrice">Cost price (₱)</label>
+              <input id="costPrice" type="number" min="0" step="0.01" required>
+            </div>
+            <div>
+              <label for="sellingPrice">Selling price (₱)</label>
+              <input id="sellingPrice" type="number" min="0" step="0.01" required>
+            </div>
+            <div>
+              <label for="initialStock">Starting stock</label>
+              <input id="initialStock" type="number" min="0" step="1" required>
+            </div>
+            <div>
+              <label for="minimumStock">Low-stock threshold</label>
+              <input id="minimumStock" type="number" min="0" step="1"
+                value="5" required>
+            </div>
+            <button type="submit" class="primary-btn">Add Product</button>
+          </form>
+        </div>
+
+        <div class="panel table-panel">
+          <h3>Product List</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th class="admin-only">Cost</th>
+                  <th>Selling Price</th>
+                  <th>Stock</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="inventoryTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section id="requests" class="page">
+        <div class="page-heading">
+          <div>
+            <h2 id="requestsTitle">Staff Requests</h2>
+            <p id="requestsSubtitle">Review Assistant Staff transactions.</p>
+          </div>
+          <select id="requestPeriod" aria-label="Request date filter">
+            <option value="today">Today</option>
+            <option value="month">This month</option>
+            <option value="year">This year</option>
+            <option value="all" selected>All dates</option>
+          </select>
+        </div>
+        <div id="requestList" class="request-list"></div>
+      </section>
+
+      <section id="reports" class="page">
+        <div class="page-heading">
+          <div>
+            <h2>Income Reports</h2>
+            <p>Summary of finalized sales only.</p>
+          </div>
+          <select id="reportPeriod" aria-label="Report period">
+            <option value="today">Today</option>
+            <option value="month">This month</option>
+            <option value="year">This year</option>
+            <option value="all">All time</option>
+          </select>
+        </div>
+
+        <div id="reportSummary" class="summary-grid"></div>
+
+        <div id="productRemovalPanel" class="panel admin-only">
+          <h3>Remove a Product from Inventory</h3>
+          <p class="small-note">
+            Removing a product hides it from the Cashier and Inventory totals.
+            All past sales, income and profit stay exactly as they are, and
+            nothing is permanently deleted. You can restore it later from the
+            Inventory page.
+          </p>
+          <div class="removal-row">
+            <select id="removeProductSelect" aria-label="Product to remove">
+              <option value="">Choose a product…</option>
+            </select>
+            <button id="removeProductBtn" type="button" class="danger-btn">Remove Product…</button>
+          </div>
+        </div>
+
+        <div class="panel table-panel">
+          <h3>Completed Sales</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Receipt</th>
+                  <th>Date</th>
+                  <th>Items</th>
+                  <th>Revenue</th>
+                  <th>Gross Profit</th>
+                  <th>Finalized By</th>
+                </tr>
+              </thead>
+              <tbody id="salesTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script type="module" src="app.js"></script></body>
+</html>
